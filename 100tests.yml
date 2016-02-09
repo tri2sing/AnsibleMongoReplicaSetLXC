@@ -1,0 +1,38 @@
+---
+
+# '
+# Need the quote to have correct syntax highlighting
+# with_item without {{ }} causes syntax highlighting to go awry
+
+    - name: Iterate through group
+      debug: msg='item = {{ item }} hostvars = {{ hostvars[item] }}'
+      with_items: groups['mongoall']
+
+# "
+# For lineinfile the parameters should use "=" and not ":"
+    - name: Iterate through group and write to file
+      lineinfile: 
+        dest=/tmp/tri2sing.txt
+        backup=yes
+        create=true
+        state=present
+        line="{{ hostvars[item]['ansible_ssh_host'] }}    {{ hostvars[item]['inventory_hostname'] }}"
+      with_items: groups['mongoall']
+
+# "
+# For lineinfile the parameters should use "=" and not ":"
+    - name: Change an existing line in file
+      lineinfile: 
+        dest=/tmp/tri2sing.txt
+        backup=yes
+        regexp='^bind_ip = 127.0.0.1'
+        create=true
+        state=present
+        line='#bind_ip = 127.0.0.1'
+
+# "
+    - name: Iterate through group and filter
+      debug: msg="master = {{ item }}"
+      when: hostvars[item]['role'] == 'master'
+      with_items: groups['mongoall' ]
+

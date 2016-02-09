@@ -1,0 +1,6 @@
+---
+
+- include: installmongo.yml
+- include: modhostsfile.yml
+- include: modmongocfg.yml
+

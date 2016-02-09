@@ -1,0 +1,6 @@
+---
+- hosts: lxchosts
+  tasks:
+    - include: roles/lxc/tasks/destroy.yml
+      vars: 
+        container_name: mongodb

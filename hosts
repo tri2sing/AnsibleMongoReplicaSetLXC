@@ -1,0 +1,17 @@
+[lxchosts]
+lxchost-01 ansible_ssh_host=10.5.2.15 container_address=192.168.33.3
+lxchost-02 ansible_ssh_host=10.5.2.16 container_address=192.168.33.4
+lxchost-03 ansible_ssh_host=10.5.2.17 container_address=192.168.33.5
+
+[mongoall]
+lxchost-01-mongodb_container ansible_ssh_host=192.168.33.3 role=master
+lxchost-02-mongodb_container ansible_ssh_host=192.168.33.4 role=slave
+lxchost-03-mongodb_container ansible_ssh_host=192.168.33.5 role=slave
+
+[replicamaster]
+lxchost-01-mongodb_container ansible_ssh_host=192.168.33.3
+
+[replicaslaves]
+lxchost-02-mongodb_container ansible_ssh_host=192.168.33.4
+lxchost-03-mongodb_container ansible_ssh_host=192.168.33.5
+

@@ -1,0 +1,82 @@
+---
+
+
+- name: Get the deployment node ssh key
+  set_fact: 
+    container_ssh_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+    # Notice the use of double quotes because of single quotes inside the command
+  delegate_to: 127.0.0.1
+
+- name: Get existing containers
+  sudo: true
+  shell: lxc-ls
+  register: lxclsvar  
+- debug: var=lxclsvar
+
+- name: Copy lxc config
+  sudo: true
+  copy: src=lxc.conf dest=/tmp/lxc-{{ ansible_hostname }}-{{ container_name }}.conf
+  when: not container_name  in lxclsvar.stdout_lines
+
+#- name: Generate UUID
+#  shell: uuidgen
+#  register: uuidvar
+#- debug: var=uuidvar
+
+- name: Create container
+  sudo: true
+  shell: lxc-create -n {{ ansible_hostname }}-{{ container_name }}_container -f /tmp/lxc-{{ ansible_hostname }}-{{ container_name }}.conf -t {{ container_template }} -- -r {{ container_release }} 
+  when: not container_name in lxclsvar.stdout_lines
+  register: lxccreatevar
+- debug: var=lxccreatevar
+#  shell: lxc-create -n {{ ansible_hostname }}-{{ container_name }}_container-{{ uuidvar.stdout.split('-')[0] }}  -f /tmp/lxc-{{ ansible_hostname }}-{{ container_name }}.conf -t {{ container_template }} -- -r {{ container_release }} 
+
+- name: Start container
+  sudo: true
+  shell: lxc-start -d -n {{ ansible_hostname }}-{{ container_name }}_container
+  when: not container_name in lxclsvar.stdout_lines
+  register: lxcstartvar
+- debug: var=lxcstartvar
+
+- name: Create .ssh directory
+  sudo: true
+  shell: lxc-attach -n {{ ansible_hostname }}-{{ container_name }}_container -- mkdir -p ~/.ssh
+  register: mkdirssh
+- debug: var=mkdirssh
+
+- name: Insert publick key from deployment host
+  sudo: true
+  shell: echo '{{ container_ssh_key }}' | lxc-attach -n {{ ansible_hostname }}-{{ container_name }}_container -- tee -a ~/.ssh/authorized_keys
+  register: insertkey
+- debug: var=insertkey
+
+- name: Allow root ssh login
+  sudo: true
+  shell: lxc-attach -n {{ ansible_hostname }}-{{ container_name }}_container -- sed -i 's/PermitRootLogin.*/PermitRootLogin\ yes/g' /etc/ssh/sshd_config
+  register: rootssh
+- debug: var=rootssh
+
+- name: Restart ssh service
+  sudo: true
+  shell: lxc-attach -n {{ ansible_hostname }}-{{ container_name }}_container -- service ssh restart
+  register: mkdirssh
+- debug: var=mkdirssh
+
+- name: Insert default interfaces config
+  sudo: true
+  shell: echo '{{ default_interfaces }}' | lxc-attach -n {{ ansible_hostname }}-{{ container_name }}_container -- tee /etc/network/interfaces
+  register: dftiface
+- debug: var=dftiface
+
+- name: Insert management interface config
+  sudo: true
+  shell: echo '{{ management_interface }}' | lxc-attach -n {{ ansible_hostname }}-{{ container_name }}_container -- tee /etc/network/interfaces.d/management.cfg
+  register: mgtiface
+- debug: var=mgtiface
+
+- name: Bring up interfaces
+  sudo: true
+  shell: lxc-attach -n {{ ansible_hostname }}-{{ container_name }}_container -- ifup -a
+  register: ifaceup
+- debug: var=ifaceup
+

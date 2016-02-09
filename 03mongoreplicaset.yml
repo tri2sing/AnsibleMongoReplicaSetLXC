@@ -1,0 +1,17 @@
+---
+
+- hosts: replicamaster
+  gather_facts: true 
+  user: root
+  tasks: 
+    - name: Intiate the replica set
+      shell: mongo --eval 'printjson(rs.initiate())'
+      register: rsinitvar
+    - debug: rsinitvar
+    
+    - name: Intiate the replica set
+      shell: mongo --eval 'printjson(rs.add("{{ item }}"))'
+      with_items: groups['replicaslaves']
+      register: rsaddvar
+    - debug: rsaddvar
+

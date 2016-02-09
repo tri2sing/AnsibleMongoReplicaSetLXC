@@ -1,0 +1,10 @@
+---
+
+- name: Modify the hosts file on the mongo nodes
+  lineinfile:
+    dest=/etc/hosts
+    backup=yes
+    create=true
+    state=present
+    line="{{ hostvars[item]['ansible_ssh_host'] }} {{ hostvars[item]['inventory_hostname'] }}"
+  with_items: groups['mongoall']

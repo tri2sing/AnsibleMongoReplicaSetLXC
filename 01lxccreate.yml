@@ -1,0 +1,6 @@
+---
+- hosts: lxchosts
+  vars: 
+    container_name: mongodb
+  roles:
+    - lxc

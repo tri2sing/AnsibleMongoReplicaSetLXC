@@ -1,0 +1,16 @@
+{
+  "commonrepos": [
+    {
+      "repo": "deb http://archive.ubuntu.com/ubuntu trusty main restricted universe multiverse",
+      "state": "present"
+    },
+    {
+      "repo": "deb http://archive.ubuntu.com/ubuntu trusty-updates main restricted universe multiverse",
+      "state": "present"
+    },
+    {
+      "repo": "deb http://security.ubuntu.com/ubuntu trusty-security main restricted universe multiverse",
+      "state": "present"
+    }
+  ]
+}

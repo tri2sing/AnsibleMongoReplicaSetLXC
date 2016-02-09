@@ -1,0 +1,41 @@
+#!/usr/bin/python
+
+import json
+from netaddr import *
+
+class IPHelper(object):
+	""" Manage IP addresses """
+
+	def __init__(self):
+		""" Manage IP addresses """
+		self.fileset = IPSet()
+		self.rangeset = IPSet(['192.168.33.0/24'])
+
+	def ips_from_file(self, pathtofile):
+		""" Add IP addresses from a file into the set"""
+		with open(pathtofile) as infile:
+			for line in infile:
+				self.fileset.add(line.strip())
+
+	def next_n_available(self, num=3):		
+		""" Find the next num available IP addresses"""
+		found = 0
+		for ip in self.rangeset:
+			if found < num:
+				if ip not in self.fileset:
+					found = found + 1
+					self.rangeset.remove(ip)
+					yield ip
+
+def main():
+	helper = IPHelper();
+	helper.ips_from_file('/tmp/mergediplist')
+	output = {}
+	i = 0
+	for ip in helper.next_n_available(10):
+		output[i] = str(ip)
+		i = i + 1
+		
+	print json.dumps(output)
+
+main()

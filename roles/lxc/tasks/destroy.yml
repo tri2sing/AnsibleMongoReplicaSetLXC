@@ -1,0 +1,14 @@
+---
+
+- name: Stop container
+  sudo: true
+  shell: lxc-stop -n {{ ansible_hostname }}-{{ container_name }}_container
+  register: lxcstopvar
+- debug: var=lxcstopvar
+
+- name: Destroy container
+  sudo: true
+  shell: lxc-destroy -n {{ ansible_hostname }}-{{ container_name }}_container
+  register: lxcdestroyvar
+- debug: var=lxcdestroyvar
+

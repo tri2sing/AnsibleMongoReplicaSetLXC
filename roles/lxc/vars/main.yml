@@ -1,0 +1,23 @@
+---
+
+container_template: ubuntu
+container_release: trusty
+container_interface: eth1
+container_netmask: 255.255.254.0
+
+default_interfaces: |
+  # The loopback network interface
+  auto lo
+  iface lo inet loopback
+  # LXC interface
+  auto eth0
+  iface eth0 inet dhcp
+  # Load any additional configs
+  source /etc/network/interfaces.d/*.cfg
+
+management_interface: |
+  auto {{ container_interface }}
+  iface {{container_interface }} inet static
+      address {{ container_address }}
+      netmask {{ container_netmask }}
+

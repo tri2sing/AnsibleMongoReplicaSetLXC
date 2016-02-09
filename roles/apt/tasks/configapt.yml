@@ -1,0 +1,12 @@
+---
+
+- name: Configure apt repos
+  sudo: true
+  apt_repository:
+    repo: '{{ item.repo }}'
+    state: '{{ item.state }}'
+    update_cache: no
+  with_items: commonrepos
+  register: addreposvar
+- debug: addreposvar
+

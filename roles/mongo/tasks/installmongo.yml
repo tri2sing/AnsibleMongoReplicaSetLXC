@@ -1,0 +1,10 @@
+---
+
+- name: Install mongodb
+  sudo: true
+  apt:
+    name: mongodb
+    state: present
+    update_cache: yes
+  register: mongoinstallvar
+- debug: mongoinstallvar

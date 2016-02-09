@@ -1,0 +1,30 @@
+---
+
+- name: Modify the bind_ip field in mongodb.conf
+  lineinfile:
+    dest=/etc/mongodb.conf
+    backup=yes
+    create=true
+    state=present
+    regexp='^bind_ip = 127.0.0.1'
+    line='#bind_ip = 127.0.0.1'
+    backrefs=yes
+  register: bindipvar
+- debug: bindipvar
+
+
+- name: Add a replica set name in mongodb.conf
+  lineinfile:
+    dest=/etc/mongodb.conf
+    backup=yes
+    create=true
+    state=present
+    line='replSet = repset99'
+  register: repsetnamevar
+- debug: repsetnamevar
+
+- name: Restart mongodb service to enable config changes
+  service: 
+    name=mongodb
+    state=restarted
+
